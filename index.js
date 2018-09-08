@@ -6,7 +6,10 @@ const bodyParser = require('body-parser')
 const flash = require('connect-flash')
 const session = require('express-session')
 
-mongoose.connect('mongodb://localhost/nodekb')
+const passport = require('passport')
+const config = require('./config/database')
+
+mongoose.connect(config.database)
 let db = mongoose.connection
 
 // Check connecttion
@@ -53,6 +56,12 @@ app.use(function (req, res, next) {
   res.locals.messages = require('express-messages')(req, res);
   next();
 });
+
+// Passport Config
+require('./config/passport')(passport)
+// Passport Middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Home Route
 app.get('/', (req, res) => {

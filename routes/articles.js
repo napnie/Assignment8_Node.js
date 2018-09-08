@@ -6,7 +6,7 @@ const { sanitizeBody } = require('express-validator/filter');
 
 // Bring in models
 let Article = require('../models/articles.js')
-let User = require('../models/user.js')
+let User = require('../models/users.js')
 
 // Edit Article
 router.get('/edit/:id', ensureAuthenticated, (req, res) => {

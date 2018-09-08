@@ -8,7 +8,7 @@ const { check, validationResult } = require('express-validator/check');
 const passport = require('passport')
 
 // Bring in models
-let User = require('../models/user.js')
+let User = require('../models/users.js')
 
 // Register Form
 router.get('/register', (req, res) => {

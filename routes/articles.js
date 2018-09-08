@@ -67,12 +67,12 @@ router.post('/add', [
             errors: errors.mapped()
         });
     } else {
-        article.title = req.body.title;
-        article.author = req.body.author;
-        article.body = req.body.body;
 
-        article.save(err=>{
-            if(err)throw err;
+        article.save( (err) => {
+            if(err) {
+                console.log(err)
+                return
+            }
             req.flash('success','Article Added');
             res.redirect('/');
         });

@@ -6,12 +6,15 @@ const { sanitizeBody } = require('express-validator/filter');
 
 // Bring in models
 let Article = require('../models/articles.js')
+let User = require('../models/user.js')
 
 // Edit Article
-router.get('/edit/:id', (req, res) => {
-    // console.log(req.params.id);
-    
+router.get('/edit/:id', ensureAuthenticated, (req, res) => {
     Article.findById(req.params.id, (err, article) => {
+        if(article.author != req.user._id) {
+            req.flash('danger', 'Unauthorized')
+            return res.redirect('/')
+        }
         res.render('edit_article', {
             title: 'Edit Article : ' + article.title,
             article: article
@@ -39,7 +42,7 @@ router.post('/edit/:id', (req, res) => {
 })
 
 // Add Route
-router.get('/add', (req, res) => {
+router.get('/add', ensureAuthenticated, (req, res) => {
     res.render('add_articles', {
         title:'Add Article'
     })
@@ -48,13 +51,13 @@ router.get('/add', (req, res) => {
 // Add Submit POST Route
 router.post('/add', [
         check('title').isLength({min:1}).trim().withMessage('Title required'),
-        check('author').isLength({min:1}).trim().withMessage('Author required'),
+        // check('author').isLength({min:1}).trim().withMessage('Author required'),
         check('body').isLength({min:1}).trim().withMessage('Body required')
 ], (req,res,next)=>{
 
     let article = new Article({
         title:req.body.title,
-        author:req.body.author,
+        author:req.user._id,
         body:req.body.body
     });
 
@@ -82,23 +85,45 @@ router.post('/add', [
 // Get Single Article
 router.get('/:id', (req, res) => {
     Article.findById(req.params.id, (err, article) => {
-        res.render('articles', {
-            article: article
+        User.findById(article.author, (err, user) => {
+            res.render('articles', {
+                article: article,
+                author: user.name
+            })
         })
     })
 })
 
 // Delete Article
 router.delete('/:id', (req, res) => {
-    let query = {_id:req.params.id}
+    if(!req.user._id) {
+        res.status(500).send()
+    }
 
-    Article.deleteOne(query, (err) => {
-        if(err) {
-            console.log(err)
+    let query = {_id:req.params.id}
+    Article.findById(req.params.id, (err, article) => {
+        if(article.author != req.user._id) {
+            res.status(500).send()
+        } else {
+            Article.deleteOne(query, (err) => {
+                if(err) {
+                    console.log(err)
+                }
+                req.flash('success', 'Article Deleted')
+                res.send('Success');
+            })
         }
-        req.flash('success', 'Deleted Article')
-        res.send('Success');
     })
 })
+
+// Access control
+function ensureAuthenticated(req, res, next) {
+    if(req.isAuthenticated()) {
+        return next()
+    } else {
+        req.flash('danger', 'Please login')
+        res.redirect('/users/login')
+    }
+}
 
 module.exports = router

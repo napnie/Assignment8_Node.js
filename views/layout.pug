@@ -13,9 +13,10 @@ html
             #navbarsExampleDefault.collapse.navbar-collapse
                 ul.navbar-nav.mr-auto
                     li.nav-item
-                        a.nav-link(href='/') Home 
-                    li.nav-item
-                        a.nav-link(href='/articles/add') Add Articles
+                        a.nav-link(href='/') Home
+                    if user 
+                        li.nav-item
+                            a.nav-link(href='/articles/add') Add Articles
                 ul.navbar-nav.mr-right
                     if user
                         li.nav-item

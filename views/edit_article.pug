@@ -7,11 +7,11 @@ block content
             label Id:
             input.form-control(name='ass', type='text', value= article._id, disabled)
         .form-group
+            label Author:
+            input.form-control(name='author', type='text', value= article.author, disabled)
+        .form-group
             label Title:
             input.form-control(name='title', type='text', value= article.title)
-        .form-group
-            label Author:
-            input.form-control(name='author', type='text', value= article.author)
         .form-group
             label Body:
             textarea.form-control(name='body')= article.body
